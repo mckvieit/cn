@@ -1,0 +1,21 @@
+Step 1:
+
+Configuring Enable Password or Enable Secret Password:
+   - Configuring an enable password or an enable secret password on the switch. This step is essential because, without it, access to the executive mode of the switch will be restricted even after establishing a Telnet connection.
+
+Step 2:
+
+Configuring a VLAN Interface on the Switch:
+   - Assigning an IP address to the VLAN interface of the switch. This IP address allows the switch to be accessed via Telnet from a laptop using the assigned address.
+
+
+Step 3:
+
+Configuring a Telnet Password for Remote Access:
+	- Setting a password on the VTY lines for Telnet access. This password is necessary for remote management of the switch via Telnet. It will be required to gain access.
+
+
+Step 4: 
+
+Testing Telnet Connectivity:
+   - Going to the command prompt and testing the Telnet connection to ensure that the configuration is correct and the switch is accessible remotely.

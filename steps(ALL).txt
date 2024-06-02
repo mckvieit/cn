@@ -1,0 +1,205 @@
+Q:Using Cpt create a basic network to implement dynamic IP address allocation and show the connectivity
+
+Steps:
+1. Create a basic network with 1 router, 2 switch and 6 pc
+2. Config the Router
+	
+	Router(config-if)#en
+	int fa 0/0
+	ip address 192.168.1.1 255.255.255.0
+	no shut down
+	
+	ip dhcp pool param1
+	default-router 192.168.1.1
+	network 192.168.1.1 255.255.255.0
+	exit
+	int fa 0/1
+	ip address 192.168.2.1 255.255.255.0
+	no shut down
+	
+	ip dhcp pool param2
+	default-router 192.168.2.1
+	network 192.168.2.1 255.255.255.0
+	exit
+3. Open the pc and move to desktop then set ip configuration to DHCP mode
+4. Request will be send to each pc
+5. Open PC-PTPC0 and in cmd write:
+	pc> ping 192.168.2.4
+6. Output
+
+
+Q:DHCP
+
+Steps:
+1. Create a basic network with a server(DHCP), a router, a switch and 3 pcs
+2. Config the Router:
+	i. Click on Interface> FastEthernet 0/0
+	ii. Provide ip address: 192.168.1.1
+	iii. Port status on
+3. Config the DHCP server:
+	i. Provide Gateway and DNS server
+	ii. goto Desktop and provide ip config
+	iii. Set to DHCP
+	iv. Request send successfully
+	v. goto services and change pool name and make services on
+	vi. Add and save
+4. Send packets
+5. Open PC-PTPC0 and then in cmd ping
+6. Output 
+
+
+Q:Configure DNS,FTP,web and Mail server using cpt
+
+Steps:
+
+DNS
+1. Create a basic network with 4 pcs connecting a switch on one side
+2. Another with 1 server and 3 pcs connecting a switch on another side
+3. Connect both sides by a Router
+4. Configure the server and the Router and the pcs
+5. Server>services>DNS>make service on>add name and address>save
+6. open a pc>cmd>ping server name(paramserver)
+7. output 
+
+WEB
+5. Server>services>HTTP>make service on>edit>index.html file>Type your customized file
+6. open a pc>web browser>type <servername> in URL>go
+
+FTP
+5. Server>services>FTP>make service on>give user name and password>permission tick>add>save
+6. Open a pc>cmd run>ftp <servername>>give username and password>logged in
+7. open a pc>text editor>create a .txt file>save
+8. open ftp cmd and type put<filename> ; get<filename>
+9. open server>desktop>cmd>ftp<servername>>login>dir>all directory from <servername> will be displayed
+
+MAIL
+5. Server>services>Email>make service on>add domain name <gmail.com>>set user and password(2)
+6. open a pc>Email>configure Mail>Fill the user info,server info,login info>compose mail>send>open another pc>config mail>receive
+7. output
+
+
+Q:Implement OSPF routing protocol using cpt
+
+Steps:
+1. Create a basic network with 4 routers(2811), 2 pcs and 2 switch
+2. configure the ip address of the pc's giving the ip,subnet mask and default gateway(the ip of the router)
+3. Config the router:
+	i. Enter the physical layer go to modules select NM-1FE2W and connect it
+	ii. goto CLI and for:	
+R0:	en
+	config t
+	int f0/0
+	ip add 20.20.20.1 255.0.0.0
+	no shut
+	int f0/1
+	ip add 50.50.50.2 255.0.0.0
+	no shut
+	int f1/0
+	ip add 10.10.10.1 255.0.0.0
+	no shut
+	wr
+	exit
+	exit
+R1:	en
+	config t
+	int f0/0
+	ip add 20.20.20.2 255.0.0.0
+	no shut
+	int f0/1
+	ip add 30.30.30.1 255.0.0.0
+	no shut
+	wr
+	exit
+	exit
+R2:	en
+	config t
+	int f0/0
+	ip add 30.30.30.2 255.0.0.0
+	no shut
+	int f0/1
+	ip add 40.40.40.1 255.0.0.0
+	no shut
+	int f1/0
+	ip add 60.60.60.1 255.0.0.0
+	no shut
+	wr
+	exit
+	exit
+R3:	en
+	config t
+	int f0/0
+	ip add 40.40.40.2 255.0.0.0
+	no shut
+	int f0/1
+	ip add 50.50.50.1 255.0.0.0
+	no shut
+	wr
+	exit
+	exit
+	iii. Now in CLI run:
+	en
+	config t
+	router ospf 1
+	network 10.0.0.0 0.255.255.255 area 0
+	network 20.0.0.0 0.255.255.255 area 0
+	network 30.0.0.0 0.255.255.255 area 0
+	network 40.0.0.0 0.255.255.255 area 0
+	network 50.0.0.0 0.255.255.255 area 0
+	network 60.0.0.0 0.255.255.255 area 0
+4. Send packets
+5. goto a router and type:
+	i. sh ip route
+	ii. sh ip ospf database
+	iii. sh ip route ospf
+	iv. sh ospf ne
+6. Output
+
+
+Q: Implement BGP routing protocol using cpt
+
+Steps:
+1. Create a basic network with 3 routers, 3 switches, 9 pc's
+2. Configure the pc's
+3. Change the physical hardware of R1: NM-IFE2W
+4. Config the Routers:
+R0:	router bgp 1
+	network 10.0.0.0
+	network 40.0.0.0
+	neighbor 40.40.40.2 remote-as 2
+	exit
+	exit
+R1:	router bgp 2
+	network 20.0.0.0
+	network 40.0.0.0
+	network 50.0.0.0
+	neighbor 40.40.40.1 remote-as 1
+	neighbor 50.50.50.2 remote-as 3
+	exit
+	exit
+R3:	router bgp 3
+	network 50.0.0.0
+	networj 30.0.0.0
+	neighbor 50.50.50.2 remote-as 2
+	exit
+	exit
+5. Now in CLI of any router type:
+	show ip route bgp
+6. Output
+7. Send packtes
+8. Record the output of packet transfer
+9. Ping pc's
+
+
+Q: Create a wired and wireless network using cpt and show the connectivity
+
+Steps:
+1. Create a basic network with 2 pc's, 1 laptop, 1 smartphone, 1 router, 1 switch and 1 Access point
+2. open Router and goto config>Interface>FastEthernet0/0>IP add:192.168.0.1>Subnet Mask>(Configure dhcp mode in CLI)opt
+3. select pc0>desktop>ip>add:192.168.0.100>default gateway:192.168.0.1
+4. open Access Point>config>Interface>Port 1>SSID:Param>Authentication: WEP, WEPkey: 1234567890
+5. i. Open pc1>physical>change hardware>desktop>ip>add:192.168.0.101>default gateway:192.168.0.1>close
+   ii. Open pc1>desktop>pc wireless>select connect<refresh>param appears>select connect>provide WEP key 1>connect>close
+6. i. Open laptop>physical>change hardware>desktop>ip>add:192.168.0.102>default gateway:192.168.0.1>close
+   ii. Open laptop>desktop>pc wireless>select connect<refresh>param appears>select connect>provide WEP key 1>connect>close
+7. open smartphone>config>interface>wireless 0>give SSID(param)>select WEP and provide WEPkey (1234567890)>close
+8. Transfer packets

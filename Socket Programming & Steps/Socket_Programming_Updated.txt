@@ -1,0 +1,550 @@
+1. Write a program to print the IP address and TCP port number of a client on server.
+Ans -> 
+Server Program:-
+import socket
+import sys
+
+s=socket.socket()
+print("Socket created")
+
+s.bind(('localhost',12345))
+s.listen(5)
+print("Listening")
+
+while True:
+    print("Now accepting")
+    c, add = s.accept()
+    print("The IP adress is: ",add)
+    c.close
+    print("Closed")
+    break
+
+Client Program:-
+import socket
+import sys
+
+sy=socket.socket()
+sy.connect(('localhost',12345))
+sy.close()
+
+Output:-
+Socket created
+Listening
+Now accepting
+The IP adress is:  ('127.0.0.1', 50382)
+Closed
+
+
+2. Write a program to print the IP address and UDP port number of a client on server.
+Ans ->
+Server Program:-
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+print("Socket created")
+s.bind(('localhost', 12345))
+print("Listening")
+data, addr = s.recvfrom(1024)
+print("The IP address is:", addr)
+s.close()
+print("Closed")
+
+Client Program:-
+import socket
+sy = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+message = b'Hello, server'
+sy.sendto(message, ('localhost', 12345))
+sy.close()
+
+Output:-
+Socket created
+Listening
+The IP address is: ('127.0.0.1', 56241)
+Closed
+
+
+3. Write a program to implement a simple TCP echo client/server application.
+Ans ->
+Server Program:-
+import socket
+import sys
+s = socket.socket()
+
+s.bind(('localhost',12345))
+s.listen(5)
+
+c,add = s.accept()
+print("Clinet connected at: ",add)
+
+while True:
+    print("Now accepting")
+    data  = c.recv(1024)
+    if not data:
+        break
+    c.sendall(data)
+    print("The received massege is: ", data.decode())
+    c.close
+
+Client Program:-
+import socket
+import sys
+
+c=socket.socket()
+c.connect(('localhost', 12345))
+print("Server connected!")
+
+while True:
+    massege = input().encode()
+    if not massege:
+        break
+    c.sendall(massege)
+    data = c.recv(1024)
+    if data.decode()=='exit':
+        break
+    print("Data received from server: ", data.decode())
+
+Server Output:-
+Clinet connected at:  ('127.0.0.1', 50960)
+Now accepting
+The received massege is:  Hii server
+Now accepting
+The received massege is:  This is clirnt
+Now accepting
+The received massege is:  This is echo program
+Now accepting
+The received massege is:  Bye
+Now accepting
+
+Client Output:-
+Server connected!
+Hii server
+Data received from server:  Hii server
+This is clirnt
+Data received from server:  This is clirnt
+This is echo program
+Data received from server:  This is echo program
+Bye
+Data received from server:  Bye
+
+
+4. Write a program to implement simple UDP echo client/server application.
+Ans ->
+Server Program:-
+import socket
+import sys
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+print("Socket created")
+
+s.bind(('localhost',12345))
+
+while True:
+    print("Now accepting")
+    data, add = s.recvfrom(1024)
+    if not data:
+        break
+    s.sendto(data, add)
+    print("The received massege is: ", data.decode())
+    s.close
+
+Client Program:-
+import socket
+import sys
+
+c=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+while True:
+    massege = input().encode()
+    if not massege:
+        break
+    c.sendto(massege, ('localhost',12345))  # encode needed to transform string to bytes
+    data, add = c.recvfrom(1024)
+    if data.decode()=='exit':
+        break
+    print("Data received from server: ", data.decode())
+
+Server Output:-
+Socket created
+Now accepting
+The received massege is:  Hii server
+Now accepting
+The received massege is:  This is client
+Now accepting
+The received massege is:  This is echo program using UDP
+Now accepting
+The received massege is:  Bye
+Now accepting
+
+Client Output:-
+Hii server
+Data received from server:  Hii server
+This is client
+Data received from server:  This is client
+This is echo program using UDP
+Data received from server:  This is echo program using UDP
+Bye
+Data received from server:  Bye
+
+
+5. Write a program to implement chat server.
+Ans ->
+Server Program:-
+import socket
+from _thread import *
+import threading
+
+print_lock = threading.Lock()
+
+def threaded(c):
+    while True:
+        data = c.recv(1024)
+        print(data.decode('ascii'))
+        if not data:
+            print('Bye')
+            #print_lock.release()
+            break
+        data = input("Enter your message: ").encode('ascii')
+        c.send(data)
+    c.close()
+
+
+def Main():
+    host = ""
+    port = 12345
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((host, port))
+    print("socket binded to port", port)
+    s.listen(5)
+    print("socket is listening")
+
+    while True:
+        s.listen(5)
+        c, addr = s.accept()
+        #print_lock.acquire()
+        print('Connected to :', addr[0], ':', addr[1])
+        start_new_thread(threaded, (c,))
+    s.close()
+
+Client Program(Create multiple clients atleast two):-
+import socket
+
+def Main():
+    host = '127.0.0.1'
+    port = 12345
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    s.connect((host,port))
+    while True:
+        message = input("Enter your message: ")
+        s.send(message.encode('ascii'))
+        data = s.recv(1024)
+        print('Received from the server :',str(data.decode('ascii')))
+        ans = input('\nDo you want to continue(y/n) :')
+        if ans == 'y':
+            continue
+        else:
+            break
+    s.close()
+
+if __name__ == '__main__':
+	Main()
+
+Server Output:-
+socket binded to port 12345
+socket is listening
+Connected to : 127.0.0.1 : 51016
+Hello
+Enter your message: Hello client
+Connected to : 127.0.0.1 : 51019
+Hii server
+Enter your message: Hii client
+This is client 1
+Enter your message: Ohh! hello client 1
+This is a chat server
+Enter your message: yes this is a chat server
+I am client 2
+Enter your message: Hii client 2
+Is this a chat server?
+Enter your message: Yes this is a chat server
+thank you
+Enter your message: welcome client 2
+bye
+Enter your message: bye client 2
+
+Bye
+This is client 1 quitting
+Enter your message: bye
+
+Bye
+
+Client 1 Output:-
+Enter your message: Hii server
+Received from the server : Hii client
+
+Do you want to continue(y/n) :y
+Enter your message: This is client 1
+Received from the server : Ohh! hello client 1
+
+Do you want to continue(y/n) :y
+Enter your message: This is a chat server
+Received from the server : yes this is a chat server
+
+Do you want to continue(y/n) :y
+Enter your message: This is client 1 quitting
+Received from the server : bye
+
+Do you want to continue(y/n) :n
+
+Client 2 Output:-
+Enter your message: Hello
+Received from the server : Hello client
+
+Do you want to continue(y/n) :y
+Enter your message: I am client 2
+Received from the server : Hii client 2
+
+Do you want to continue(y/n) :y
+Enter your message: Is this a chat server?
+Received from the server : Yes this is a chat server
+
+Do you want to continue(y/n) :y
+Enter your message: thank you
+Received from the server : welcome client 2
+
+Do you want to continue(y/n) :y
+Enter your message: bye
+Received from the server : bye client 2
+
+Do you want to continue(y/n) :n
+
+
+6. Write a program to implement Multicast Socket.
+Ans ->
+Server Program:-
+import socket
+group = '224.1.1.1'
+port = 5004
+# 2-hop restriction in network
+ttl = 2
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
+while True:
+    message = input().encode()
+    sock.sendto(message, (group, port))
+
+Client Program(Create Multiple Clients atleast two):-
+import socket
+import struct
+MCAST_GRP = '224.1.1.1'
+MCAST_PORT = 5004
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind(('', MCAST_PORT))
+mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+while True:
+    data = sock.recv(1024)
+    print(data.decode())
+
+Server Output:-
+Hii this is server speaking
+This is a multicast program
+Sending messages to multiple clients
+Quitting
+
+Client 1 Output:-
+Hii this is server speaking
+This is a multicast program
+Sending messages to multiple clients
+Quitting
+
+Client 2 Output:-
+Hii this is server speaking
+This is a multicast program
+Sending messages to multiple clients
+Quitting
+
+
+7. Write a program to implement Broadcast Socket.
+Ans ->
+Server Program:-
+import socket
+
+server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+
+message = b"your very important message"
+while True:
+    server.sendto(message, ('<broadcast>', 37020))
+    print("message sent!")
+
+Client Program(Create Multiple Clients atleast two):-
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) # UDP
+
+client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+client.bind(("", 37020))
+while True:
+    data, addr = client.recvfrom(1024)
+    data = data.decode()
+    print("received message: %s"%data)
+
+Server Output:-
+message sent!
+message sent!
+message sent!
+.
+.
+.
+message sent!
+message sent!
+message sent!
+
+Client 1 Output:-
+received message: your very important message
+received message: your very important message
+.
+.
+.
+received message: your very important message
+received message: your very important message
+
+Client 2 Program:-
+received message: your very important message
+received message: your very important message
+.
+.
+.
+received message: your very important message
+received message: your very important message
+
+
+8. Write a program to implement a Prototype Multithreaded Server.
+Ans ->
+Server Program:-
+import socket
+from _thread import *
+import threading
+
+print_lock = threading.Lock()
+
+def threaded(c):
+    while True:
+        data = c.recv(1024)
+        print(data.decode('ascii'))
+        if not data:
+            print('Bye')
+            #print_lock.release()
+            break
+        data = input("Enter your message: ").encode('ascii')
+        c.send(data)
+    c.close()
+
+
+def Main():
+    host = ""
+    port = 12345
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((host, port))
+    print("socket binded to port", port)
+    s.listen(5)
+    print("socket is listening")
+
+    while True:
+        s.listen(5)
+        c, addr = s.accept()
+        #print_lock.acquire()
+        print('Connected to :', addr[0], ':', addr[1])
+        start_new_thread(threaded, (c,))
+    s.close()
+
+Client Program(Create multiple clients atleast two):-
+import socket
+
+def Main():
+    host = '127.0.0.1'
+    port = 12345
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    s.connect((host,port))
+    while True:
+        message = input("Enter your message: ")
+        s.send(message.encode('ascii'))
+        data = s.recv(1024)
+        print('Received from the server :',str(data.decode('ascii')))
+        ans = input('\nDo you want to continue(y/n) :')
+        if ans == 'y':
+            continue
+        else:
+            break
+    s.close()
+
+if __name__ == '__main__':
+	Main()
+
+Server Output:-
+socket binded to port 12345
+socket is listening
+Connected to : 127.0.0.1 : 51016
+Hello
+Enter your message: Hello client
+Connected to : 127.0.0.1 : 51019
+Hii server
+Enter your message: Hii client
+This is client 1
+Enter your message: Ohh! hello client 1
+This is a Multithreading Program
+Enter your message: yes this is a Multithreading Program
+I am client 2
+Enter your message: Hii client 2
+Is this a Multithreading Program?
+Enter your message: Yes this is a Multithreading Program
+thank you
+Enter your message: welcome client 2
+bye
+Enter your message: bye client 2
+
+Bye
+This is client 1 quitting
+Enter your message: bye
+
+Bye
+
+Client 1 Output:-
+Enter your message: Hii server
+Received from the server : Hii client
+
+Do you want to continue(y/n) :y
+Enter your message: This is client 1
+Received from the server : Ohh! hello client 1
+
+Do you want to continue(y/n) :y
+Enter your message: This is a Multithreading Program
+Received from the server : yes this is a Multithreading Program
+
+Do you want to continue(y/n) :y
+Enter your message: This is client 1 quitting
+Received from the server : bye
+
+Do you want to continue(y/n) :n
+
+Client 2 Output:-
+Enter your message: Hello
+Received from the server : Hello client
+
+Do you want to continue(y/n) :y
+Enter your message: I am client 2
+Received from the server : Hii client 2
+
+Do you want to continue(y/n) :y
+Enter your message: Is this a Multithreading Program?
+Received from the server : Yes this is a Multithreading Program
+
+Do you want to continue(y/n) :y
+Enter your message: thank you
+Received from the server : welcome client 2
+
+Do you want to continue(y/n) :y
+Enter your message: bye
+Received from the server : bye client 2
+
+Do you want to continue(y/n) :n
